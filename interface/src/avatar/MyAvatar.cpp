@@ -1920,6 +1920,8 @@ bool MyAvatar::shouldRenderHead(const RenderArgs* renderArgs) const {
     return !defaultMode || !firstPerson || !insideHead;
 }
 
+glm::vec3 MyAvatar::getCameraPosition() const { return _cameraPosition; }
+
 void MyAvatar::updateOrientation(float deltaTime) {
 
     //  Smoothly rotate body with arrow keys
@@ -2025,11 +2027,38 @@ void MyAvatar::updateOrientation(float deltaTime) {
         _smoothOrientationTimer = 0.0f;
     }
 
-    getHead()->setBasePitch(getHead()->getBasePitch() + getDriveKey(PITCH) * _pitchSpeed * deltaTime);
+    // new third person
+    const float CAMERA_MOVE_SPEED = 3.0f;
+    const float CAMERA_ROTATE_SPEED = 4.0f;
+
+    const float CAMERA_MOVE_MIN_DELTA = 0.25f;
+    const float CAMERA_ROTATE_MIN_DELTA = 2.0f;
+    
+    // position
+    glm::vec3 boom_offset = _boomLength * -IDENTITY_FORWARD;
+    _cameraPositionTarget = getDefaultEyePosition() + (getHeadOrientation() * boom_offset);
+
+    float distance = glm::distance(_cameraPositionTarget, _cameraPosition);
+    glm::vec3 cameraSpeed = glm::normalize(_cameraPositionTarget - _cameraPosition) * (distance * CAMERA_MOVE_SPEED * deltaTime);
+
+    if (distance > CAMERA_MOVE_MIN_DELTA) {
+        _cameraPosition += cameraSpeed;
+    }
+
+    // orientation
+    _cameraPitchTarget += getDriveKey(PITCH);
+    
+    float pitch = getHead()->getBasePitch();
+    float pitch_delta = _cameraPitchTarget - pitch;
+
+    if (abs(pitch_delta) > CAMERA_ROTATE_MIN_DELTA) {
+        getHead()->setBasePitch(pitch + (pitch_delta * CAMERA_ROTATE_SPEED * deltaTime));
+    }
 
     auto headPose = getHeadControllerPoseInAvatarFrame();
     if (headPose.isValid()) {
         glm::quat localOrientation = headPose.rotation * Quaternions::Y_180;
+        
         // these angles will be in radians
         // ... so they need to be converted to degrees before we do math...
         glm::vec3 euler = glm::eulerAngles(localOrientation) * DEGREES_PER_RADIAN;

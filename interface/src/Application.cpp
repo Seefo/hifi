@@ -2298,7 +2298,7 @@ void Application::paintGL() {
                     _myCamera.setOrientation(glm::quat_cast(camMat));
                 } else {
                     _myCamera.setPosition(myAvatar->getDefaultEyePosition());
-                    _myCamera.setOrientation(myAvatar->getMyHead()->getHeadOrientation());
+                    _myCamera.setOrientation(myAvatar->getMyHead()->getCameraOrientation());
                 }
             } else if (_myCamera.getMode() == CAMERA_MODE_THIRD_PERSON) {
                 if (isHMDMode()) {
@@ -2309,8 +2309,7 @@ void Application::paintGL() {
                 } else {
                     _myCamera.setOrientation(myAvatar->getHead()->getOrientation());
                     if (Menu::getInstance()->isOptionChecked(MenuOption::CenterPlayerInView)) {
-                        _myCamera.setPosition(myAvatar->getDefaultEyePosition()
-                            + _myCamera.getOrientation() * boomOffset);
+                        _myCamera.setPosition(myAvatar->getCameraPosition());
                     } else {
                         _myCamera.setPosition(myAvatar->getDefaultEyePosition()
                             + myAvatar->getOrientation() * boomOffset);

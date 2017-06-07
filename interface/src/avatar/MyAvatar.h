@@ -557,6 +557,9 @@ public:
     Q_INVOKABLE bool isUp(const glm::vec3& direction) { return glm::dot(direction, _worldUpDirection) > 0.0f; }; // true iff direction points up wrt avatar's definition of up.
     Q_INVOKABLE bool isDown(const glm::vec3& direction) { return glm::dot(direction, _worldUpDirection) < 0.0f; };
 
+    // new third person camera
+    glm::vec3 getCameraPosition() const;
+
 
 public slots:
     void increaseSize();
@@ -837,6 +840,12 @@ private:
     void setAway(bool value);
 
     std::vector<int> _pinnedJoints;
+
+    // new third person camera
+    float _cameraPitchTarget{ 0 };
+    glm::vec3 _cameraPosition{ 0, 0, 0 };
+    glm::vec3 _cameraPositionTarget{ 0, 0, 0 };
+
 };
 
 QScriptValue audioListenModeToScriptValue(QScriptEngine* engine, const AudioListenerMode& audioListenerMode);
