@@ -2308,12 +2308,7 @@ void Application::paintGL() {
                         myAvatar->getOrientation() * boomOffset);
                 } else {
                     _myCamera.setOrientation(myAvatar->getHead()->getOrientation());
-                    if (Menu::getInstance()->isOptionChecked(MenuOption::CenterPlayerInView)) {
-                        _myCamera.setPosition(myAvatar->getCameraPosition());
-                    } else {
-                        _myCamera.setPosition(myAvatar->getDefaultEyePosition()
-                            + myAvatar->getOrientation() * boomOffset);
-                    }
+                    _myCamera.setPosition(myAvatar->getCameraPosition());
                 }
             } else if (_myCamera.getMode() == CAMERA_MODE_MIRROR) {
                 if (isHMDMode()) {

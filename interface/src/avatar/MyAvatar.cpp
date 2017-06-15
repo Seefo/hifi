@@ -2033,21 +2033,34 @@ void MyAvatar::updateOrientation(float deltaTime) {
 
     const float CAMERA_MOVE_MIN_DELTA = 0.25f;
     const float CAMERA_ROTATE_MIN_DELTA = 2.0f;
+
+    glm::vec3 boom_offset = _boomLength * -IDENTITY_FORWARD;
     
     // position
-    glm::vec3 boom_offset = _boomLength * -IDENTITY_FORWARD;
-    _cameraPositionTarget = getDefaultEyePosition() + (getHeadOrientation() * boom_offset);
+    if (Menu::getInstance()->isOptionChecked(MenuOption::CenterPlayerInView)) {
+        float pitch = getHead()->getBasePitch() - 90;
+        float yaw = getBodyYaw();
+        float RAD_TO_DEG = 1 / 180.0f;
 
-    float distance = glm::distance(_cameraPositionTarget, _cameraPosition);
-    glm::vec3 cameraSpeed = glm::normalize(_cameraPositionTarget - _cameraPosition) * (distance * CAMERA_MOVE_SPEED * deltaTime);
+        float x = glm::asin(yaw * RAD_TO_DEG);
+        float y = glm::acos(pitch * RAD_TO_DEG);
 
-    if (distance > CAMERA_MOVE_MIN_DELTA) {
-        _cameraPosition += cameraSpeed;
+        _cameraPosition = getPosition() + (glm::vec3(0, y, 0) * getHeadOrientation());
+
+    } else {
+        _cameraPositionTarget = getDefaultEyePosition() + (getHeadOrientation() * boom_offset);
+
+        float distance = glm::distance(_cameraPositionTarget, _cameraPosition);
+        glm::vec3 cameraSpeed = glm::normalize(_cameraPositionTarget - _cameraPosition) * (distance * CAMERA_MOVE_SPEED * deltaTime);
+
+        if (distance > CAMERA_MOVE_MIN_DELTA) {
+            _cameraPosition += cameraSpeed;
+        }
     }
 
     // orientation
     _cameraPitchTarget += getDriveKey(PITCH);
-    
+
     float pitch = getHead()->getBasePitch();
     float pitch_delta = _cameraPitchTarget - pitch;
 
