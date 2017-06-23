@@ -69,6 +69,9 @@ const float MAX_BOOST_SPEED = 0.5f * MAX_WALKING_SPEED; // action motor gets add
 const float MIN_AVATAR_SPEED = 0.05f;
 const float MIN_AVATAR_SPEED_SQUARED = MIN_AVATAR_SPEED * MIN_AVATAR_SPEED; // speed is set to zero below this
 
+const float PARTIALLY_PRESSED_WALKING_SPEED = 0.375f * MAX_WALKING_SPEED;
+const float PARTIALLY_PRESSED_THRESHOLD = 0.90f;
+
 const float YAW_SPEED_DEFAULT = 120.0f;   // degrees/sec
 const float PITCH_SPEED_DEFAULT = 90.0f; // degrees/sec
 
@@ -2095,7 +2098,11 @@ void MyAvatar::updateActionMotor(float deltaTime) {
         _actionMotorVelocity = motorSpeed * direction;
     } else {
         // we're interacting with a floor --> simple horizontal speed and exponential decay
-        _actionMotorVelocity = MAX_WALKING_SPEED * direction;
+        if (directionLength >= PARTIALLY_PRESSED_THRESHOLD) {
+            _actionMotorVelocity = MAX_WALKING_SPEED * direction;
+        } else {
+            _actionMotorVelocity = PARTIALLY_PRESSED_WALKING_SPEED * direction;
+        }
     }
 
     float boomChange = getDriveKey(ZOOM);
