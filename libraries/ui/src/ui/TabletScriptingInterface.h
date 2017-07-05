@@ -196,6 +196,8 @@ public:
 
     QQuickItem* getQmlMenu() const;
 
+    void removeButtonsFromToolbar();
+
 signals:
     /**jsdoc
      * Signaled when this tablet receives an event from the html/js embedded in the tablet
@@ -236,7 +238,6 @@ protected:
     void removeButtonsFromHomeScreen();
     void loadHomeScreen(bool forceOntoHomeScreen);
     void addButtonsToToolbar();
-    void removeButtonsFromToolbar();
 
     bool _initialScreen { false };
     QVariant _initialPath { "" };

@@ -12,6 +12,8 @@
 
 #include <QtWidgets/QApplication>
 
+#include <ui/TabletScriptingInterface.h>
+
 #include <shared/QtHelpers.h>
 #include <SettingHandle.h>
 #include <UserActivityLogger.h>
@@ -388,6 +390,10 @@ void ScriptEngines::stopAllScripts(bool restart) {
     }
     // wait for engines to stop (ie: providing time for .scriptEnding cleanup handlers to run) before
     // triggering reload of any Client scripts / Entity scripts
+
+    auto tabletScriptingInterface = DependencyManager::get<TabletScriptingInterface>();
+    auto tablet = dynamic_cast<TabletProxy*>(tabletScriptingInterface->getTablet("com.highfidelity.interface.tablet.system"));
+
     QTimer::singleShot(1000, this, [=]() {
         for(const auto &scriptName : toReload) {
             auto scriptEngine = getScriptEngine(scriptName);
@@ -396,14 +402,19 @@ void ScriptEngines::stopAllScripts(bool restart) {
                 scriptEngine->waitTillDoneRunning();
                 qCDebug(scriptengine) << "done waiting on script:" << scriptName;
             }
-            qCDebug(scriptengine) << "reloading script..." << scriptName;
-            reloadScript(scriptName);
         }
-        if (restart) {
-            qCDebug(scriptengine) << "stopAllScripts -- emitting scriptsReloading";
-            emit scriptsReloading();
-        }
-        _isReloading = false;
+        QTimer::singleShot(1000, this, [=]() {
+            tablet->removeButtonsFromToolbar();
+            for(const auto &scriptName : toReload) {
+                reloadScript(scriptName);
+                qCDebug(scriptengine) << "reloading script..." << scriptName;
+            }
+            if (restart) {
+                qCDebug(scriptengine) << "stopAllScripts -- emitting scriptsReloading";
+                emit scriptsReloading();
+            }
+            _isReloading = false;
+        });
     });
 }
 
