@@ -2298,7 +2298,7 @@ void Application::paintGL() {
                     _myCamera.setOrientation(glm::quat_cast(camMat));
                 } else {
                     _myCamera.setPosition(myAvatar->getDefaultEyePosition());
-                    _myCamera.setOrientation(myAvatar->getMyHead()->getCameraOrientation());
+                    _myCamera.setOrientation(myAvatar->getMyHead()->getHeadOrientation());
                 }
             } else if (_myCamera.getMode() == CAMERA_MODE_THIRD_PERSON) {
                 if (isHMDMode()) {

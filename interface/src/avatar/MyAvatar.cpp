@@ -2028,8 +2028,8 @@ void MyAvatar::updateOrientation(float deltaTime) {
     }
 
     // new third person
-    const float CAMERA_MOVE_SPEED = 3.0f;
-    const float CAMERA_ROTATE_SPEED = 4.0f;
+    const float CAMERA_MOVE_SPEED = 4.0f;
+    const float CAMERA_ROTATE_SPEED = 2.5f;
 
     const float CAMERA_MOVE_MIN_DELTA = 0.25f;
     const float CAMERA_ROTATE_MIN_DELTA = 2.0f;
@@ -2038,15 +2038,20 @@ void MyAvatar::updateOrientation(float deltaTime) {
     
     // position
     if (Menu::getInstance()->isOptionChecked(MenuOption::CenterPlayerInView)) {
-        float pitch = getHead()->getBasePitch() - 90;
+
+        /*_myCamera.setPosition(myAvatar->getDefaultEyePosition()
+                            + myAvatar->getOrientation() * boomOffset);*/
+
+        /*float pitch = getHead()->getBasePitch() - 90;
         float yaw = getBodyYaw();
         float RAD_TO_DEG = 1 / 180.0f;
 
         float x = glm::asin(yaw * RAD_TO_DEG);
         float y = glm::acos(pitch * RAD_TO_DEG);
 
-        _cameraPosition = getPosition() + (glm::vec3(0, y, 0) * getHeadOrientation());
+        _cameraPosition = getPosition() + (glm::vec3(0, y, 0) * getHeadOrientation());*/
 
+        _cameraPosition = getDefaultEyePosition() + (getHeadOrientation() * boom_offset);
     } else {
         _cameraPositionTarget = getDefaultEyePosition() + (getHeadOrientation() * boom_offset);
 
@@ -2065,7 +2070,7 @@ void MyAvatar::updateOrientation(float deltaTime) {
     float pitch_delta = _cameraPitchTarget - pitch;
 
     if (abs(pitch_delta) > CAMERA_ROTATE_MIN_DELTA) {
-        getHead()->setBasePitch(pitch + (pitch_delta * CAMERA_ROTATE_SPEED * deltaTime));
+        getHead()->setBasePitch(pitch + (pitch_delta * (_pitchSpeed * pitch_delta) * deltaTime));
     }
 
     auto headPose = getHeadControllerPoseInAvatarFrame();
